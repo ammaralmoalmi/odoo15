@@ -1,0 +1,3 @@
+#!/bin/bash
+echo -e Will now stop: ...
+docker-compose stop $1

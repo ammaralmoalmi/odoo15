@@ -1,0 +1,3 @@
+#!/bin/bash
+echo -e Will now down: ...
+docker-compose down $1

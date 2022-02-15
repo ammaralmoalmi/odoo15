@@ -1,0 +1,76 @@
+version: '2.2'
+services:
+  odoo:
+    container_name: ${SERVICE_NAME}_${ODOO_CONTAINER_NAME}
+    image: ${ODOO_CONTAINER_IMAGE}
+    restart: $RESTART_POLICY 
+    expose:
+      - 8069
+      - 8071
+      - 8072
+    ports:
+      - 8069:8069
+      - 8071:8071
+      - 8072:8072
+    volumes:
+      - "./volumes/odoo/local:/mnt/local"
+      - "odoo_data:/var/lib/odoo"
+    depends_on:
+      - postgres
+    links:
+      - postgres:db
+    environment:
+      - PASSWORD=$ODOO_DB_PASSWORD
+      - USER=$ODOO_DB_USER
+      - VIRTUAL_PORT=8069
+      - VIRTUAL_HOST=${ODOO_CONTAINER_VHOST}${SERVICE_DOMAIN}
+      - LETSENCRYPT_HOST=${ODOO_CONTAINER_VHOST}${SERVICE_DOMAIN}
+      - LETSENCRYPT_EMAIL=$LETSENCRYPT_CONTACT
+  odoolatest:
+    container_name: ${SERVICE_NAME_LATEST}_${ODOO_CONTAINER_NAME_LATEST}
+    image: ${ODOO_CONTAINER_IMAGE_LATEST}
+    restart: $RESTART_POLICY 
+    expose:
+      - 8069
+      - 8071
+      - 8072
+    ports:
+      - 9069:8069
+      - 9071:8071
+      - 9072:8072
+    volumes:
+      - "./volumes/odoo/local:/mnt/local"
+      - "odoo_latest_data:/var/lib/odoo"
+    depends_on:
+      - postgres
+    links:
+      - postgres:db
+    environment:
+      - PASSWORD=$ODOO_DB_PASSWORD
+      - USER=$ODOO_DB_USER
+      - VIRTUAL_PORT=8069
+      - VIRTUAL_HOST=${ODOO_CONTAINER_VHOST}${SERVICE_DOMAIN}
+      - LETSENCRYPT_HOST=${ODOO_CONTAINER_VHOST}${SERVICE_DOMAIN}
+      - LETSENCRYPT_EMAIL=$LETSENCRYPT_CONTACT
+  postgres:
+    container_name: ${SERVICE_NAME}_${PG_CONTAINER_NAME}
+    image: $PG_CONTAINER_IMAGE
+    restart: $RESTART_POLICY
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=$ODOO_DB_USER
+      - POSTGRES_PASSWORD=$ODOO_DB_PASSWORD
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  odoo_data:
+    external:
+      name: ${SERVICE_NAME}_${ODOO_CONTAINER_VOLUME_DATA}
+  odoo_latest_data:
+    external:
+      name: ${SERVICE_NAME_LATEST}_${ODOO_CONTAINER_VOLUME_DATA_LATEST}
+  postgres_data:
+    external:
+      name: ${SERVICE_NAME}_${PG_CONTAINER_VOLUME_DATA}
